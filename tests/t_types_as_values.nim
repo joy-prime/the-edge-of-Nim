@@ -29,10 +29,10 @@ test "pass type literal to proc":
 # Consistent with the manual's statement that "these values exists only during
 # the compilation phase", We can't store a type literal in a top-level variable.
 
-doesnt_compile:
+reject:
   var t = int
 
-doesnt_compile:
+reject:
   let t = int
 
 # Interestingly though, we can store a type literal in a const:
@@ -63,9 +63,8 @@ test "pass type const to proc":
 
 # There is also an issue #10004 suggesting, reasonably, that the following
 # should work:
-doesnt_compile:
-  static:
-    let t: type[int] = int
+reject:
+  let t: type[int] = int
 
 # Once we have put a type value in a ``const``, we have created the appearance
 # that we could use it at runtime. But to prove that, we would need some
@@ -88,6 +87,7 @@ test "use type-valued const in a constant expression":
 # Let's see what else we can and cannot do with type values.
 
 # The following behavior is truly weird!
+# Perhaps it is the same as https://github.com/nim-lang/Nim/issues/5358 ?
 test "``if`` returning a type value":
   let n = typetraits.name(if true: int else: string)
   check(n == "None")
