@@ -1,3 +1,4 @@
+import macros
 import unittest
 import helpers
 from typetraits import nil
@@ -91,3 +92,5 @@ test "use type-valued const in a constant expression":
 test "``if`` returning a type value":
   let n = typetraits.name(if true: int else: string)
   check(n == "None")
+
+
