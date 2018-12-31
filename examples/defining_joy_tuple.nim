@@ -1,8 +1,8 @@
 import macros, tables
 
-type JoyField = tuple[fieldName: string, typeAst: NimNode]
+type Attribute = tuple[name: string, typeAst: NimNode]
 
-macro declareJoyField(name: untyped): untyped =
+macro declareAttribute(name: untyped): untyped =
   expectKind(name, nnkIdent)
   nnkVarSection.newTree(
     nnkIdentDefs.newTree(
@@ -12,33 +12,29 @@ macro declareJoyField(name: untyped): untyped =
           newIdentNode("compileTime")
         )
       ),
-      newIdentNode("JoyField"),
+      newIdentNode("Attribute"),
       newEmptyNode()
     )
   )
 
-macro defineJoyField(jf: static[var JoyField], 
-                     fieldName, typ: untyped): untyped =
-  jf = (fieldName: $fieldName, typeAst: typ)
+macro defineAttribute(attr: static[var Attribute],
+                      name, typ: untyped): untyped =
+  attr = (name: $name, typeAst: typ)
   newEmptyNode()
 
-template joyField(fieldName, typ: untyped): untyped =
-  declareJoyField(fieldName)
-  defineJoyField(fieldName, fieldName, typ)
+template attribute(name, typ: untyped): untyped =
+  declareAttribute(name)
+  defineAttribute(name, name, typ)
 
-macro joyTuple(tupleTypeName: untyped, 
-               jf: static[var JoyField]): typed = 
-  let fieldNameAst = newIdentNode(jf.fieldName)
-  let typeAst = jf.typeAst
+macro data(tupleTypeName: untyped,
+           attr: static[Attribute]): typed =
+  let nameAst = newIdentNode(attr.name)
+  let typeAst = attr.typeAst
   quote:
-    type `tupleTypeName` = tuple[`fieldNameAst`: `typeAst`]
+    type `tupleTypeName` = tuple[`nameAst`: `typeAst`]
 
-joyField(firstName, string)
-joyTuple(Person, firstName)
+attribute(firstName, string)
+data(Person, firstName)
 
 let p: Person = (firstName: "Sybil")
-
 echo p.firstName
-
-
-  
